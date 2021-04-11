@@ -4,7 +4,7 @@ import { ApolloProvider } from '@apollo/client/react';
 import React from 'react';
 import App from './App';
 
-const httpLink = createHttpLink({ uri: 'http://localhost:4000' });
+const httpLink = createHttpLink({ uri: 'https://afternoon-hamlet-76374.herokuapp.com/' });
 
 const authLink = setContext(() => {
   const token = localStorage.getItem('jwtToken');
