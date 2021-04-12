@@ -1,11 +1,11 @@
-import React, { useContext, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Menu } from 'semantic-ui-react';
-import { AuthContext } from '../context/auth';
+import React, { useContext, useState } from "react";
+import { Link } from "react-router-dom";
+import { Menu } from "semantic-ui-react";
+import { AuthContext } from "../context/auth";
 
 const HeaderMenu = () => {
   const pathname = window.location.pathname;
-  const slug = pathname === '/' ? 'home' : pathname.substr(1);
+  const slug = pathname === "/" ? "home" : pathname.substr(1);
   const [activeItem, setActiveItem] = useState(slug);
 
   const { auth, logout } = useContext(AuthContext);
@@ -15,9 +15,9 @@ const HeaderMenu = () => {
       <Menu.Item
         className="hover-teal"
         name="home"
-        active={activeItem === 'home'}
+        active={activeItem === "home"}
         onClick={() => {
-          setActiveItem('home');
+          setActiveItem("home");
         }}
         as={Link}
         to="/"
@@ -31,7 +31,7 @@ const HeaderMenu = () => {
               name="sign out"
               onClick={logout}
               as={Link}
-              to={'/login'}
+              to={"/login"}
             />
           </>
         ) : (
@@ -39,9 +39,9 @@ const HeaderMenu = () => {
             <Menu.Item
               className="hover-teal"
               name="login"
-              active={activeItem === 'login'}
+              active={activeItem === "login"}
               onClick={() => {
-                setActiveItem('login');
+                setActiveItem("login");
               }}
               as={Link}
               to="/login"
@@ -49,9 +49,9 @@ const HeaderMenu = () => {
             <Menu.Item
               className="hover-teal"
               name="sign up"
-              active={activeItem === 'signup'}
+              active={activeItem === "signup"}
               onClick={() => {
-                setActiveItem('signup');
+                setActiveItem("signup");
               }}
               as={Link}
               to="/signup"

@@ -1,8 +1,9 @@
-import { useMutation } from '@apollo/client';
-import gql from 'graphql-tag';
-import React, { useState } from 'react';
-import { Button, Confirm, Icon } from 'semantic-ui-react';
-import { FETCH_ALL_POSTS_QUERY } from '../utils/gqlqueries';
+import { useMutation } from "@apollo/client";
+import gql from "graphql-tag";
+import React, { useState } from "react";
+import { Button, Confirm, Icon } from "semantic-ui-react";
+import { FETCH_ALL_POSTS_QUERY } from "../utils/gqlqueries";
+import HoverPopup from "./HoverPopup";
 
 const DeleteButton = ({ postId, commentId, callback }) => {
   const [openConfirm, setOpenConfirm] = useState(false);
@@ -37,20 +38,22 @@ const DeleteButton = ({ postId, commentId, callback }) => {
     setOpenConfirm(true);
   }
   return (
-    <>
+    <HoverPopup
+      content={commentId ? "Delete this comment" : "Delete this post"}
+    >
       <Button color="red" floated="right" basic onClick={handleDelete}>
         <Icon name="trash" style={{ margin: 0 }} />
       </Button>
       <Confirm
         open={openConfirm}
-        header={commentId ? 'Delete comment?' : 'Delete post?'}
+        header={commentId ? "Delete comment?" : "Delete post?"}
         content="This action cannot be reversed!"
         onCancel={() => setOpenConfirm(false)}
         onConfirm={deletePostOrComment}
         confirmButton="Yes"
         size="tiny"
       />
-    </>
+    </HoverPopup>
   );
 };
 

@@ -1,11 +1,11 @@
-import moment from 'moment';
-import React, { useContext } from 'react';
-import { Link } from 'react-router-dom';
-import { Button, Card, Icon, Label } from 'semantic-ui-react';
-import { AuthContext } from '../context/auth';
-import DeleteButton from './DeleteButton';
-import HoverPopup from './HoverPopup';
-import LikeButton from './LikeButton';
+import moment from "moment";
+import React, { useContext } from "react";
+import { Link } from "react-router-dom";
+import { Button, Card, Icon, Label } from "semantic-ui-react";
+import { AuthContext } from "../context/auth";
+import DeleteButton from "./DeleteButton";
+import HoverPopup from "./HoverPopup";
+import LikeButton from "./LikeButton";
 
 const PostCard = ({ post }) => {
   const { auth } = useContext(AuthContext);
@@ -34,11 +34,7 @@ const PostCard = ({ post }) => {
             </Label>
           </Button>
         </HoverPopup>
-        {activeUser === post.username && (
-          <HoverPopup content="Delete this post">
-            <DeleteButton postId={post.id} />
-          </HoverPopup>
-        )}
+        {activeUser === post.username && <DeleteButton postId={post.id} />}
       </Card.Content>
     </Card>
   );
