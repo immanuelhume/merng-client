@@ -1,8 +1,8 @@
-import { useMutation } from '@apollo/client';
-import gql from 'graphql-tag';
-import React, { useState } from 'react';
-import { Button, Confirm, Icon } from 'semantic-ui-react';
-import { FETCH_ALL_POSTS_QUERY } from '../utils/gqlqueries';
+import { useMutation } from "@apollo/client";
+import gql from "graphql-tag";
+import React, { useState } from "react";
+import { Button, Confirm, Popup } from "semantic-ui-react";
+import { POSTS_QUERY } from "../utils/gqlqueries";
 
 const DeleteButton = ({ postId, commentId, callback }) => {
   const [openConfirm, setOpenConfirm] = useState(false);
@@ -16,13 +16,21 @@ const DeleteButton = ({ postId, commentId, callback }) => {
     },
     update(cache, result) {
       if (!commentId) {
-        const data = cache.readQuery({ query: FETCH_ALL_POSTS_QUERY });
-        const newPosts = data.allPosts.filter(
-          (post) => post.id !== result.data.deletePost.id
+        const data = cache.readQuery({ query: POSTS_QUERY });
+        const {
+          posts: { pageInfo, edges },
+        } = data;
+        const newEdges = edges.filter(
+          (edge) => edge.node.id !== result.data.deletePost.id
         );
         cache.writeQuery({
-          query: FETCH_ALL_POSTS_QUERY,
-          data: { allPosts: newPosts },
+          query: POSTS_QUERY,
+          data: {
+            posts: {
+              pageInfo,
+              edges: newEdges,
+            },
+          },
         });
         if (callback) {
           callback();
@@ -38,12 +46,22 @@ const DeleteButton = ({ postId, commentId, callback }) => {
   }
   return (
     <>
-      <Button color="red" floated="right" basic onClick={handleDelete}>
-        <Icon name="trash" style={{ margin: 0 }} />
-      </Button>
+      <Popup
+        inverted
+        content={commentId ? "Delete this comment" : "Delete this post"}
+        trigger={
+          <Button
+            color="red"
+            floated="right"
+            basic
+            onClick={handleDelete}
+            icon="trash"
+          ></Button>
+        }
+      />
       <Confirm
         open={openConfirm}
-        header={commentId ? 'Delete comment?' : 'Delete post?'}
+        header={commentId ? "Delete comment?" : "Delete post?"}
         content="This action cannot be reversed!"
         onCancel={() => setOpenConfirm(false)}
         onConfirm={deletePostOrComment}

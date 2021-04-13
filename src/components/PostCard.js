@@ -1,11 +1,10 @@
-import moment from 'moment';
-import React, { useContext } from 'react';
-import { Link } from 'react-router-dom';
-import { Button, Card, Icon, Label } from 'semantic-ui-react';
-import { AuthContext } from '../context/auth';
-import DeleteButton from './DeleteButton';
-import HoverPopup from './HoverPopup';
-import LikeButton from './LikeButton';
+import moment from "moment";
+import React, { useContext } from "react";
+import { Link } from "react-router-dom";
+import { Button, Card, Label, Popup } from "semantic-ui-react";
+import { AuthContext } from "../context/auth";
+import DeleteButton from "./DeleteButton";
+import LikeButton from "./LikeButton";
 
 const PostCard = ({ post }) => {
   const { auth } = useContext(AuthContext);
@@ -24,21 +23,25 @@ const PostCard = ({ post }) => {
           likes={post.likes}
           postId={post.id}
         />
-        <HoverPopup content="Comment on this post">
-          <Button as="div" labelPosition="right">
-            <Button color="teal" basic as={Link} to={`post/${post.id}`}>
-              <Icon name="comments" />
+        <Popup
+          inverted
+          content="Comment on this post"
+          trigger={
+            <Button as="div" labelPosition="right">
+              <Button
+                color="teal"
+                basic
+                as={Link}
+                to={`post/${post.id}`}
+                icon="comments"
+              ></Button>
+              <Label as="a" basic color="teal" pointing="left">
+                {post.commentCount}
+              </Label>
             </Button>
-            <Label as="a" basic color="teal" pointing="left">
-              {post.commentCount}
-            </Label>
-          </Button>
-        </HoverPopup>
-        {activeUser === post.username && (
-          <HoverPopup content="Delete this post">
-            <DeleteButton postId={post.id} />
-          </HoverPopup>
-        )}
+          }
+        />
+        {activeUser === post.username && <DeleteButton postId={post.id} />}
       </Card.Content>
     </Card>
   );

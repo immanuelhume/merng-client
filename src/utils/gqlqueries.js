@@ -1,4 +1,4 @@
-import gql from 'graphql-tag';
+import gql from "graphql-tag";
 
 export const FETCH_ALL_POSTS_QUERY = gql`
   {
@@ -40,6 +40,39 @@ export const FETCH_POST_QUERY = gql`
         body
         username
         createdAt
+      }
+    }
+  }
+`;
+
+export const POSTS_QUERY = gql`
+  query getPosts($first: Int, $after: String, $sortBy: String) {
+    posts(first: $first, after: $after, sortBy: $sortBy) {
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
+      edges {
+        cursor
+        node {
+          id
+          body
+          username
+          createdAt
+          commentCount
+          likeCount
+          comments {
+            id
+            username
+            createdAt
+            body
+          }
+          likes {
+            id
+            username
+            createdAt
+          }
+        }
       }
     }
   }

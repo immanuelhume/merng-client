@@ -1,26 +1,37 @@
-import { ApolloClient, createHttpLink, InMemoryCache } from '@apollo/client';
-import { setContext } from '@apollo/client/link/context';
-import { ApolloProvider } from '@apollo/client/react';
-import React from 'react';
-import App from './App';
+import { ApolloClient, createHttpLink, InMemoryCache } from "@apollo/client";
+import { setContext } from "@apollo/client/link/context";
+import { ApolloProvider } from "@apollo/client/react";
+import { relayStylePagination } from "@apollo/client/utilities";
+import React from "react";
+import App from "./App";
 
-const httpLink = createHttpLink({ uri: 'https://afternoon-hamlet-76374.herokuapp.com/' });
+const uri =
+  process.env.NODE_ENV === "production"
+    ? "https://afternoon-hamlet-76374.herokuapp.com/"
+    : "http://localhost:4000/";
+
+const httpLink = createHttpLink({ uri });
 
 const authLink = setContext(() => {
-  const token = localStorage.getItem('jwtToken');
-  console.log(token);
+  const token = localStorage.getItem("jwtToken");
   return {
     headers: {
-      authorization: token ? `Bearer ${token}` : '',
+      authorization: token ? `Bearer ${token}` : "",
     },
   };
 });
 
-console.log(authLink.concat(httpLink));
-
 const client = new ApolloClient({
   link: authLink.concat(httpLink),
-  cache: new InMemoryCache(),
+  cache: new InMemoryCache({
+    typePolicies: {
+      Query: {
+        fields: {
+          posts: relayStylePagination(),
+        },
+      },
+    },
+  }),
 });
 
 export default (

@@ -1,20 +1,30 @@
-import { useMutation } from '@apollo/client';
-import gql from 'graphql-tag';
-import React from 'react';
-import { Card, Divider, Form } from 'semantic-ui-react';
-import { FETCH_ALL_POSTS_QUERY } from '../utils/gqlqueries';
-import { useForm } from '../utils/hooks';
+import { useMutation } from "@apollo/client";
+import gql from "graphql-tag";
+import React from "react";
+import { Card, Divider, Form } from "semantic-ui-react";
+import { POSTS_QUERY } from "../utils/gqlqueries";
+import { useForm } from "../utils/hooks";
 
 const NewPostCard = () => {
-  const [fieldInfo, updateFields] = useForm({ postBody: '' });
+  const [fieldInfo, updateFields] = useForm({ postBody: "" });
 
   const [createPost, { error }] = useMutation(NEW_POST_MUTATION, {
     update(cache, result) {
-      const data = cache.readQuery({ query: FETCH_ALL_POSTS_QUERY });
-      const newPosts = [result.data.createPost, ...data.allPosts];
+      const {
+        data: { createPost: post },
+      } = result;
+      const data = cache.readQuery({ query: POSTS_QUERY });
+      const newEdge = { cursor: post.id, node: post };
+      const newEdges = [newEdge, ...data.posts.edges];
+      console.log(newEdges);
       cache.writeQuery({
-        query: FETCH_ALL_POSTS_QUERY,
-        data: { allPosts: newPosts },
+        query: POSTS_QUERY,
+        data: {
+          posts: {
+            edges: newEdges,
+            pageInfo: data.posts.pageInfo,
+          },
+        },
       });
     },
     onError(err) {
@@ -30,7 +40,7 @@ const NewPostCard = () => {
   function handleSubmit(e) {
     e.preventDefault();
     createPost();
-    fieldInfo.postBody = '';
+    fieldInfo.postBody = "";
   }
 
   return (

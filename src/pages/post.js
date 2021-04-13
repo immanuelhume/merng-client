@@ -1,8 +1,8 @@
-import { useMutation, useQuery } from '@apollo/client';
-import gql from 'graphql-tag';
-import moment from 'moment';
-import React, { useContext } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useMutation, useQuery } from "@apollo/client";
+import gql from "graphql-tag";
+import moment from "moment";
+import React, { useContext } from "react";
+import { Link, useParams } from "react-router-dom";
 import {
   Button,
   Comment,
@@ -10,17 +10,20 @@ import {
   Divider,
   Form,
   Header,
-} from 'semantic-ui-react';
-import DeleteButton from '../components/DeleteButton';
-import LikeButton from '../components/LikeButton';
-import { AuthContext } from '../context/auth';
-import { FETCH_POST_QUERY } from '../utils/gqlqueries';
-import { useForm } from '../utils/hooks';
+} from "semantic-ui-react";
+import DeleteButton from "../components/DeleteButton";
+import LikeButton from "../components/LikeButton";
+import { AuthContext } from "../context/auth";
+import { FETCH_POST_QUERY } from "../utils/gqlqueries";
+import { useForm } from "../utils/hooks";
+
+// TODO sort button
+// TODO see more button
 
 const PostPage = (props) => {
   const { postId } = useParams();
   const [fieldInfo, updateFields] = useForm({
-    commentBody: '',
+    commentBody: "",
   });
 
   const { auth } = useContext(AuthContext);
@@ -55,7 +58,7 @@ const PostPage = (props) => {
   function handleSubmitComment(e) {
     e.preventDefault();
     createComment();
-    fieldInfo.commentBody = '';
+    fieldInfo.commentBody = "";
   }
 
   return (
@@ -63,10 +66,11 @@ const PostPage = (props) => {
       {moment(post.createdAt).fromNow()}
       <Header size="large">{post.username}</Header>
       <Divider />
+      {/* BUG popup in wrong position */}
       {activeUser === post.username && (
         <DeleteButton
           postId={post.id}
-          callback={() => props.history.push('/')}
+          callback={() => props.history.push("/")}
         />
       )}
       <LikeButton
