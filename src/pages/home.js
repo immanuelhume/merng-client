@@ -1,5 +1,5 @@
 import { NetworkStatus, useQuery } from "@apollo/client";
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 import {
   Button,
   Card,
@@ -25,22 +25,6 @@ const Home = () => {
   // into view
   // BUG does not click!
   const loadMoreButtonRef = useRef(null);
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const [entry] = entries;
-        if (entry.isIntersecting) {
-          entry.target.click();
-        }
-      },
-      { root: null, rootMargin: "0px", threshold: 0.1 }
-    );
-    // BUG observed element is apparently not an element
-    //     when returning to Home page from another page
-    // if (loadMoreButtonRef.current) {
-    //   observer.observe(loadMoreButtonRef.current);
-    // }
-  }, []);
 
   const { loading, error, data, fetchMore, refetch, networkStatus } = useQuery(
     POSTS_QUERY,
