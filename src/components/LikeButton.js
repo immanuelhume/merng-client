@@ -2,9 +2,8 @@ import { useMutation } from "@apollo/client";
 import gql from "graphql-tag";
 import React, { useContext } from "react";
 import { Link } from "react-router-dom";
-import { Button, Icon, Label } from "semantic-ui-react";
+import { Button, Label, Popup } from "semantic-ui-react";
 import { AuthContext } from "../context/auth";
-import HoverPopup from "./HoverPopup";
 
 const LikeButton = ({ likeCount, likes, postId, floated }) => {
   const { auth } = useContext(AuthContext);
@@ -24,34 +23,38 @@ const LikeButton = ({ likeCount, likes, postId, floated }) => {
   }
 
   return (
-    <HoverPopup content="Like this post">
-      <Button
-        as="div"
-        labelPosition="right"
-        onClick={toggleLike}
-        floated={floated}
-      >
-        {activeUser ? (
-          liked ? (
-            <Button color="teal">
-              <Icon name="thumbs up" />
-            </Button>
+    <Popup
+      inverted
+      content="Like this post"
+      trigger={
+        <Button
+          as="div"
+          labelPosition="right"
+          onClick={toggleLike}
+          floated={floated}
+        >
+          {activeUser ? (
+            liked ? (
+              <Button color="teal" icon="thumbs up"></Button>
+            ) : (
+              <Button color="teal" basic icon="thumbs up"></Button>
+            )
           ) : (
-            <Button color="teal" basic>
-              <Icon name="thumbs up" />
-            </Button>
-          )
-        ) : (
-          <Button color="teal" basic as={Link} to="/login">
-            <Icon name="thumbs up" />
-          </Button>
-        )}
+            <Button
+              color="teal"
+              basic
+              as={Link}
+              to="/login"
+              icon="thumbs up"
+            ></Button>
+          )}
 
-        <Label as="a" basic color="teal" pointing="left">
-          {likeCount}
-        </Label>
-      </Button>
-    </HoverPopup>
+          <Label as="a" basic color="teal" pointing="left">
+            {likeCount}
+          </Label>
+        </Button>
+      }
+    />
   );
 };
 

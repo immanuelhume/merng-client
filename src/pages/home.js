@@ -1,18 +1,56 @@
-import { useQuery } from "@apollo/client";
-import gql from "graphql-tag";
-import React, { useContext } from "react";
-import { Button, Card, Grid, Header, Transition } from "semantic-ui-react";
+import { NetworkStatus, useQuery } from "@apollo/client";
+import React, { useContext, useEffect, useRef, useState } from "react";
+import {
+  Button,
+  Card,
+  Grid,
+  Header,
+  Popup,
+  Transition,
+} from "semantic-ui-react";
 import NewPostCard from "../components/NewPostCard";
 import PostCard from "../components/PostCard";
 import { AuthContext } from "../context/auth";
-import { FETCH_ALL_POSTS_QUERY } from "../utils/gqlqueries";
+import { POSTS_QUERY } from "../utils/gqlqueries";
 
-// TODO implement see more button
 // TODO sort button
+// TODO back to top button
 
 const Home = () => {
-  const { loading, error, data } = useQuery(FETCH_ALL_POSTS_QUERY);
   const { auth } = useContext(AuthContext);
+  const [sortDesc, setSortDesc] = useState(true);
+
+  // set up auto infinite scroll here
+  // clicks button automatically when load more button is scrolled
+  // into view
+  // BUG does not click!
+  const loadMoreButtonRef = useRef(null);
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries;
+        if (entry.isIntersecting) {
+          entry.target.click();
+        }
+      },
+      { root: null, rootMargin: "0px", threshold: 0.1 }
+    );
+    // BUG observed element is apparently not an element
+    //     when returning to Home page from another page
+    // if (loadMoreButtonRef.current) {
+    //   observer.observe(loadMoreButtonRef.current);
+    // }
+  }, []);
+
+  const { loading, error, data, fetchMore, refetch, networkStatus } = useQuery(
+    POSTS_QUERY,
+    {
+      variables: {
+        sortBy: sortDesc ? "desc" : "asc",
+      },
+      fetchPolicy: "network-only",
+    }
+  );
   if (loading) {
     return <Header size="large">loading...</Header>;
   }
@@ -20,61 +58,66 @@ const Home = () => {
     console.log(JSON.stringify(error, null, 2));
     return <Header size="large">error!</Header>;
   }
-  const { allPosts } = data;
+  const {
+    posts: { pageInfo, edges: posts },
+  } = data;
+  const isRefetching = networkStatus === NetworkStatus.fetchMore;
+
   return (
     <div>
       <Header size="large" style={{ textAlign: "center" }}>
         Recent Posts
       </Header>
+      <Popup
+        content={
+          sortDesc ? "Sort oldest posts first" : "Sort latest posts first"
+        }
+        inverted
+        trigger={
+          <Button
+            floated="right"
+            icon={
+              sortDesc ? "sort content ascending" : "sort content descending"
+            }
+            onClick={() => {
+              setSortDesc(!sortDesc);
+              refetch();
+            }}
+          ></Button>
+        }
+      />
       <Card.Group style={{ justifyContent: "center" }}>
         {auth && <NewPostCard />}
         {/* BUG transition does not work */}
         <Transition.Group>
-          {allPosts.map((post) => {
-            return <PostCard key={post.id} post={post} />;
+          {posts.map((post) => {
+            return <PostCard key={post.node.id} post={post.node} />;
           })}
         </Transition.Group>
       </Card.Group>
-      <Grid>
-        <Grid.Column textAlign="center">
-          <Button>load more</Button>
-        </Grid.Column>
-      </Grid>
+      {/* BUG button is not set to loading when fetchMore */}
+      {pageInfo.hasNextPage && (
+        <Grid>
+          <Grid.Column textAlign="center">
+            <Button
+              ref={loadMoreButtonRef}
+              disabled={isRefetching}
+              loading={isRefetching}
+              onClick={() => {
+                fetchMore({
+                  variables: {
+                    after: pageInfo.endCursor,
+                  },
+                });
+              }}
+            >
+              load more
+            </Button>
+          </Grid.Column>
+        </Grid>
+      )}
     </div>
   );
 };
-
-const POSTS_QUERY = gql`
-  query getPosts($first: Int, $after: String) {
-    posts(first: $first, after: $after) {
-      pageInfo {
-        endCursor
-        hasNextPage
-      }
-      edges {
-        cursor
-        node {
-          id
-          body
-          username
-          createdAt
-          commentCount
-          likeCount
-          comments {
-            id
-            username
-            createdAt
-            body
-          }
-          likes {
-            id
-            username
-            createdAt
-          }
-        }
-      }
-    }
-  }
-`;
 
 export default Home;
